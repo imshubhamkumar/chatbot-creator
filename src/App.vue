@@ -1,26 +1,46 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <sideNav />
+  <div class="main-section inactive">
+    <main className="">
+        <router-view></router-view>
+    </main>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import sideNav from './components/sideNav.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    sideNav
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* #app {
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+} */
+.main-section {
+  position: fixed;
+  left: 72px;
+  top: 0;
+  width: 95.5%;
+  transition: left .2s ease-in;
+  z-index: -1;
+}
+
+.main-section .sub-main-section {
+  position: absolute;
+  left: 250px;
+  width: 100%;
+  transition: left .2s ease-in;
+  z-index: -1;
+}
+
+.sub-main-section main {
+  position: absolute;
+  top: 8px;
 }
 </style>
