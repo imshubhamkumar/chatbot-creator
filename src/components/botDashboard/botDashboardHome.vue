@@ -2,7 +2,7 @@
   <div class="bot-main-container">
     <navbarVue />
     <div class="chart-container">
-      <VueFlow :nodes="nodes" :edges="edges" connection-mode="Loose" class="customnodeflow">
+      <VueFlow :nodes="nodes1" :edges="edges1" connection-mode="Loose" class="customnodeflow">
         <template #node-custom="props">
           <customNodeVue
             v-bind="props"
@@ -20,8 +20,9 @@
 <script>
 import navbarVue from "./navbar.vue";
 import customNodeVue from "./customNode.vue";
-import { VueFlow, Position } from "@braks/vue-flow";
+import { VueFlow } from "@braks/vue-flow";
 import { ref } from "vue";
+import { getNodes, getEdges, createNode } from '../../helpers/services';
 
 export default {
   name: "botDashboardHomeVue",
@@ -31,61 +32,70 @@ export default {
     customNodeVue,
   },
   setup() {
-    const nodesData = [
-        {
-          id: "1",
-          type: "custom",
-          label: "Start point",
-          data: "home_response",
-          position: { x: 630, y: 40 },
-        },
-        {
-          id: "2",
-          type: "custom",
-          label: "Bot response",
-          data: "bot_response",
-          position: { x: 730, y: 150 },
-          sourcePosition: Position.Right,
-        },
-        {
-          id: "3",
-          type: "custom",
-          label: "Default fallback",
-          data: "default_fall",
-          position: { x: 530, y: 150 },
-          sourcePosition: Position.Right,
-          targetPosition: Position.Left
-        },]
-        const nodes = ref(nodesData)
-        const edges = ref([{ id: "e1-2", source: "1", target: "2" }, { id: "e1-3", source: "1", target: "3" }])
-
-        function addNewNodes(label, data, positions, currentId) {
-            const nodeId = (nodesData.length + 1).toString();
+        function addNewNodes(label, data, positions, currentId, type) {
             const newNode = {
-                id: nodeId,
-                type: 'custom',
-                label: label,
-                data: data,
-                position: {
+                botId: this.id,
+                nodeType: type,
+                nodeUIType: 'custom',
+                nodeLabel: label,
+                nodeData: data,
+                nodePosition: {
                     x: positions['x'],
                     y: positions['y'] + 100,
                 },
             };
-            const edgeId = `e${currentId}-${nodeId}`
             const newEdge = {
-                id: edgeId,
-                source: currentId,
-                target: nodeId
+              botId: this.id,
+              source: currentId,
             }
-            nodes.value.push(newNode);
-            edges.value.push(newEdge);
+            const body = {
+              newNode,
+              newEdge
+            }
+            createNode(body).then(() => getAllNodes()).catch(err => console.log(err));
+        }
+        function getAllNodes() {
+              getNodes(this.id).then(data => {
+              const nods = [];
+              for (let i = 0; i < data.data.length; i++) {
+                nods.push({
+                  id: data.data[i].nodeId,
+                  type: data.data[i].nodeUIType,
+                  label: data.data[i].nodeLabel,
+                  data: data.data[i].nodeData,
+                  position: data.data[i].nodePosition,
+                })
+              }
+              this.nodes1 = ref(nods);
+            })
+            
+    getEdges(this.id).then(data => {
+      const edgs = [];
+      for (let i = 0; i < data.data.length; i++) {
+        edgs.push({
+          id: data.data[i].edgeId,
+          source: data.data[i].sourceId,
+          target: data.data[i].targetId,
+        })
+      }
+      this.edges1 = ref(edgs)
+    })
         }
         return {
-            nodes,
-            edges,
-            addNewNodes
+            addNewNodes,
+            getAllNodes
         }
   },
+  data() {
+    return {
+      id: this.$route.params.botId,
+      nodes1: undefined,
+      edges1: undefined
+    }
+  },
+  mounted() {
+    this.getAllNodes();
+  }
 };
 </script>
 <style>

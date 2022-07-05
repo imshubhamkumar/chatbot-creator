@@ -3,8 +3,7 @@
   <div class="container">
     <div class="row">
       <div class="col-3">
-        <router-link to="/dashbord">
-          <div class="card button-card">
+        <div class="card button-card" @click="isCreateModalShow = true">
             <div class="card-body">
               <div class="button-card-content">
                 <div class="button-icon">
@@ -14,24 +13,36 @@
               </div>
             </div>
           </div>
-        </router-link>
       </div>
-      <div class="col-3">
-        <botCardVue />
+      <div class="col-3" v-for="(bot, index) in bots" :key="index">
+        <botCardVue :name="bot.botName" :description="bot.botDescription" :botId="bot.botId"/>
       </div>
     </div>
   </div>
+  <createBotModalVue v-show="isCreateModalShow" @close-modal="isCreateModalShow = false"/>
 </template>
 
 <script>
 import navBar from "./navbar.vue";
 import botCardVue from "./botCard.vue";
+import createBotModalVue from "./createBotModal.vue";
+import { getBots } from "@/helpers/services";
 export default {
   name: "HelloWorld",
   components: {
     navBar,
     botCardVue,
+    createBotModalVue
   },
+  data () {
+    return {
+      isCreateModalShow: false,
+      bots: undefined
+    }
+  },
+  mounted() {
+    getBots().then(data => this.bots=data.data)
+  }
 };
 </script>
 

@@ -33,7 +33,7 @@
         </div>
       </template>
     </div>
-    <template v-if="showButtons && node_type != 'default_fall'">
+    <template v-if="showButtons">
       <div :data-type="node_type" class="edit-node">
         <div
           class="btn-group btn-group-sm"
@@ -54,7 +54,7 @@
     <div class="add-options dropdown" @mouseleave="addOptions=false">
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
             <li>
-                <template v-if="node_type == 'user_response' || node_type == 'home_response'">
+                <template v-if="node_type != 'bot_response'">
                 <a class="dropdown-item" @click="addNewNodesChild('Bot response', 'bot_response', position, nodeId)">
                     <div class="add-option-icons">
                         <i class="bi bi-reply-fill"></i>
@@ -62,7 +62,7 @@
                     Bot response
                 </a>
                 </template>
-                <template v-if="node_type == 'bot_response' || node_type == 'home_response'">
+                <template v-if="node_type != 'user_response'">
                 <a class="dropdown-item" @click="addNewNodesChild('User response', 'user_response', position, nodeId)">
                     <div class="add-option-icons">
                     <i class="bi bi-person-video3"></i>
@@ -71,14 +71,16 @@
                 </a>
                 </template>
             </li>
+            <template v-if="node_type != 'default_fall'">
             <li>
-                <a class="dropdown-item">
+                <a class="dropdown-item" @click="addNewNodesChild('Default fallback', 'default_fall', position, nodeId)">
                     <div class="add-option-icons">
                     <i class="bi bi-braces-asterisk"></i>
                     </div>
                     Fallback
                 </a>
             </li>
+            </template>
         </ul>
     </div>
     </template>
@@ -293,7 +295,8 @@ export default {
   line-height: 20px;
   cursor: pointer;
 }
-.add-node[data-type="bot_response"], .add-node[data-type="home_response"] {
+.add-node[data-type="bot_response"], .add-node[data-type="home_response"],
+.add-node[data-type="default_fall"] {
   position: absolute;
   top: 4px;
   right: -43px;
@@ -317,7 +320,8 @@ export default {
   cursor: pointer;
 }
 
-.edit-node[data-type="bot_response"], .edit-node[data-type="home_response"] {
+.edit-node[data-type="bot_response"], .edit-node[data-type="home_response"],
+.edit-node[data-type="default_fall"] {
   position: absolute;
   left: 16px;
   bottom: 38px;
