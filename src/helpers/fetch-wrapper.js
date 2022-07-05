@@ -38,6 +38,7 @@ function authHeader(url) {
 function handleResponse(response) {
     return response.text().then(text => {
         const data = text && JSON.parse(text);
+        console.log(data.errors)
         if (!response.ok || data.errors) {
             const { user, logout } = useAuthStore();
             if ([401, 403].includes(response.status) && user) {
